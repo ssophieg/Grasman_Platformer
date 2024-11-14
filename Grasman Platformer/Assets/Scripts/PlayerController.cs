@@ -28,6 +28,7 @@ public class PlayerController : MonoBehaviour
         //manage the actual movement of the character.
         Vector2 playerInput = new Vector2();
 
+        //Get player input
         if (Input.GetKey(KeyCode.A))
         {
             playerInput = Vector2.left;
@@ -57,6 +58,7 @@ public class PlayerController : MonoBehaviour
         }
         else
         {
+            //Return acceleration to zero when nothing is pressed
             acceleration = 0;
         }
 
@@ -71,13 +73,13 @@ public class PlayerController : MonoBehaviour
 
     private void MovementUpdate(Vector2 playerInput)
     {
-        if (playerInput == Vector2.left || playerInput == Vector2.right)
+        if (playerInput == Vector2.left || playerInput == Vector2.right) //player move
         {
             playerRigidbody.velocity = acceleration * playerInput * Time.deltaTime;
         }
-        else if (playerInput == Vector2.up)
+        else if (playerInput == Vector2.up) //player jump
         {
-            playerRigidbody.velocity = 450 * Vector2.up * Time.deltaTime;
+            playerRigidbody.velocity = 300 * Vector2.up * Time.deltaTime;
         }
 
         //playerRigidbody.velocity = acceleration * playerInput * Time.deltaTime;
