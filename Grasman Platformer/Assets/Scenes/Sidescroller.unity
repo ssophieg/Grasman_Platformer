@@ -1695,6 +1695,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   playerRigidbody: {fileID: 1433354318}
   acceleration: 0
+  maxSpeed: 200
+  accelSpeed: 10
 --- !u!4 &1433354315
 Transform:
   m_ObjectHideFlags: 0
