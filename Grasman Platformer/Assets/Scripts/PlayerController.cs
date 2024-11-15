@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.Burst.CompilerServices;
 using UnityEngine;
 using UnityEngine.Rendering;
 
@@ -94,7 +95,16 @@ public class PlayerController : MonoBehaviour
     }
     public bool IsGrounded()
     {
-        return true;
+        if (Physics2D.Raycast(playerRigidbody.position, Vector2.down, 0.7f))
+        {
+            Debug.Log("Grounded");
+            return true;
+        }
+        else
+        {
+            Debug.Log("Not grounded");
+            return false;
+        }
     }
 
     public FacingDirection GetFacingDirection()
