@@ -10,6 +10,8 @@ public class PlayerController : MonoBehaviour
     public float acceleration;
     public float maxSpeed = 200f;
     public float accelSpeed = 10f;
+
+    float lastKey = 1;
     public enum FacingDirection
     {
         left, right
@@ -61,11 +63,6 @@ public class PlayerController : MonoBehaviour
             //Return acceleration to zero when nothing is pressed
             acceleration = 0;
         }
-
-        if (Input.GetKeyDown(KeyCode.A) || Input.GetKeyDown(KeyCode.D))
-        {
-            acceleration = 0;
-        }
         
         MovementUpdate(playerInput);
 
@@ -82,20 +79,43 @@ public class PlayerController : MonoBehaviour
             playerRigidbody.velocity = 300 * Vector2.up * Time.deltaTime;
         }
 
-        //playerRigidbody.velocity = acceleration * playerInput * Time.deltaTime;
     }
 
     public bool IsWalking()
     {
-        return false;
+        if (Input.GetKey(KeyCode.A) || Input.GetKey(KeyCode.D))
+        {
+            return true;
+        }
+        else
+        {
+            return false;
+        }
     }
     public bool IsGrounded()
     {
-        return false;
+        return true;
     }
 
     public FacingDirection GetFacingDirection()
     {
-        return FacingDirection.left;
+        if (Input.GetKey(KeyCode.A))
+        {
+            lastKey = 1;
+        }
+
+        if (Input.GetKey(KeyCode.D))
+        {
+            lastKey = 2;
+        }
+
+        if (lastKey == 1)
+        {
+            return FacingDirection.left;
+        }
+        else
+        {
+            return FacingDirection.right;
+        }
     }
 }
