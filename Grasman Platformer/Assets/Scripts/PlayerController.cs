@@ -13,7 +13,7 @@ public class PlayerController : MonoBehaviour
     public float accelSpeed = 10f;
 
     //jump values
-    public float apexHeight = 90;
+    public float apexHeight = 5;
     public float apexTime = 60; //one minute
     public float currTime;
     public Vector2 initialPosition;
@@ -109,11 +109,11 @@ public class PlayerController : MonoBehaviour
 
         if (playerInput == Vector2.up && IsGrounded() == true) //player jump
         {
-            currentVelocity.y += (gravity * currTime + initialJumpVelocity);
+            currentVelocity.y += (initialJumpVelocity);
         }
 
         
-        playerRigidbody.velocity = currentVelocity;
+        playerRigidbody.velocity = currentVelocity + gravity * Vector2.up *Time.deltaTime;
         //Debug.Log(playerRigidbody.velocity.x);
     }
 
