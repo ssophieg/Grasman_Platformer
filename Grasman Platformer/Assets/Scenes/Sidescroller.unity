@@ -1697,7 +1697,7 @@ MonoBehaviour:
   acceleration: 0
   maxSpeed: 200
   accelSpeed: 10
-  apexHeight: 5
+  apexHeight: 4
   apexTime: 1
   currTime: 0
   initialPosition: {x: 0, y: 0}

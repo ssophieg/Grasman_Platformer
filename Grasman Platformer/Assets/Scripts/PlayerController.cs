@@ -13,14 +13,14 @@ public class PlayerController : MonoBehaviour
     public float accelSpeed = 10f;
 
     //jump values
-    public float apexHeight = 5;
+    public float apexHeight = 4;
     public float apexTime = 60; //one minute
-    public float currTime;
-    public Vector2 initialPosition;
     public Vector2 currentVelocity;
 
     public float initialJumpVelocity;
     public float gravity;
+
+    public float terminalSpeed = -6;
 
     float lastKey = 1;
     public enum FacingDirection
@@ -35,15 +35,12 @@ public class PlayerController : MonoBehaviour
         //jump position formula values calculations
         initialJumpVelocity = 2 * apexHeight / apexTime;
         gravity = -2 * apexHeight / (apexTime * apexTime); 
-
-        //movement values
    
     }
 
     // Update is called once per frame
     void FixedUpdate()
     {
-        currTime += 1;
 
         //The input from the player needs to be determined and then passed in the to the MovementUpdate which should
         //manage the actual movement of the character.
@@ -80,8 +77,6 @@ public class PlayerController : MonoBehaviour
 
         if (Input.GetKey(KeyCode.W))
         {
-            currTime = 0;
-            initialPosition = playerRigidbody.position; 
             playerInput = Vector2.up;
             Debug.Log("jumped!");
         }
@@ -114,7 +109,12 @@ public class PlayerController : MonoBehaviour
 
         
         playerRigidbody.velocity = currentVelocity + gravity * Vector2.up *Time.deltaTime;
-        //Debug.Log(playerRigidbody.velocity.x);
+
+        if (playerRigidbody.velocity.y <= terminalSpeed)
+        {
+            playerRigidbody.velocity = new Vector2(currentVelocity.x + gravity * Time.deltaTime, terminalSpeed);
+        } 
+        Debug.Log(playerRigidbody.velocity.y);
     }
 
     public bool IsWalking()
