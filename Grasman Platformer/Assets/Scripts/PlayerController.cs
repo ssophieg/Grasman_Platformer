@@ -23,6 +23,10 @@ public class PlayerController : MonoBehaviour
     public float terminalSpeed = -6;
 
     float lastKey = 1;
+
+    //coyote time timer
+
+    public float coyoteTimer = 5;
     public enum FacingDirection
     {
         left, right
@@ -78,9 +82,22 @@ public class PlayerController : MonoBehaviour
         if (Input.GetKey(KeyCode.W))
         {
             playerInput = Vector2.up;
-            Debug.Log("jumped!");
+            //Debug.Log("jumped!");
+
         }
 
+        //set coyote timer to full if player is still grounded
+        if (IsGrounded() == true)
+        {
+            coyoteTimer = 1f;
+        }
+        else if (IsGrounded() == false) 
+        {
+            //start counting down when not grounded
+            coyoteTimer -= 0.1f;
+        }
+
+        Debug.Log(coyoteTimer);
         MovementUpdate(playerInput);
 
     }
@@ -102,9 +119,12 @@ public class PlayerController : MonoBehaviour
             currentVelocity.x = 0;
         }
 
-        if (playerInput == Vector2.up && IsGrounded() == true) //player jump
+        //player jump
+        if (playerInput == Vector2.up && (IsGrounded() == true || coyoteTimer >= 0)) 
         {
             currentVelocity.y += (initialJumpVelocity);
+
+            coyoteTimer = -1;
         }
 
         
@@ -114,7 +134,7 @@ public class PlayerController : MonoBehaviour
         {
             playerRigidbody.velocity = new Vector2(currentVelocity.x + gravity * Time.deltaTime, terminalSpeed);
         } 
-        Debug.Log(playerRigidbody.velocity.y);
+        //Debug.Log(playerRigidbody.velocity.y);
     }
 
     public bool IsWalking()
