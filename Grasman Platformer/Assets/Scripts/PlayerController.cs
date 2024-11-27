@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using Unity.Burst.CompilerServices;
+using UnityEditor.Search;
 using UnityEngine;
 using UnityEngine.Rendering;
 
@@ -27,10 +28,24 @@ public class PlayerController : MonoBehaviour
     //coyote time timer
 
     public float coyoteTimer = 5;
+
+    //Week 12
+    public int health = 10;
+
+    Vector2 playerInput = new Vector2();
+
     public enum FacingDirection
     {
         left, right
     }
+
+    public enum CharacterState
+    {
+        idle, jump, walk, die
+    }
+
+    public CharacterState currentCharacterState = CharacterState.idle;
+    public CharacterState previousCharacterState = CharacterState.idle;
 
     // Start is called before the first frame update
     void Start()
@@ -42,13 +57,84 @@ public class PlayerController : MonoBehaviour
    
     }
 
+    private void Update()
+    {
+        previousCharacterState = currentCharacterState;
+
+        if (Input.GetKeyDown(KeyCode.W))
+        {
+            playerInput = Vector2.up;
+            //Debug.Log("jumped!");
+        }
+
+        switch (currentCharacterState)
+        {
+            case CharacterState.die:
+                //we dead ):
+                break;
+
+            case CharacterState.jump:
+
+                if (IsGrounded())
+                {
+                    if (IsWalking())
+                    {
+                        currentCharacterState = CharacterState.walk;
+                    }
+                    else
+                    {
+                        currentCharacterState = CharacterState.idle;
+                    }
+                }
+                break;
+
+            case CharacterState.walk:
+
+                if (!IsWalking())
+                {
+                    currentCharacterState = CharacterState.idle;
+                }
+
+                if (!IsGrounded())
+                {
+                    currentCharacterState = CharacterState.jump;
+                }
+
+                break;
+
+            case CharacterState.idle:
+
+                //is walking?
+
+                if (IsWalking())
+                {
+                    currentCharacterState = CharacterState.walk;
+                }
+
+                //is jumping?
+                if (!IsGrounded())
+                {
+                    currentCharacterState = CharacterState.jump;
+                }
+                break;
+
+        }
+
+        if (IsDead()) 
+        {
+            currentCharacterState = CharacterState.die;
+        }
+
+        
+
+    }
     // Update is called once per frame
     void FixedUpdate()
     {
 
         //The input from the player needs to be determined and then passed in the to the MovementUpdate which should
         //manage the actual movement of the character.
-        Vector2 playerInput = new Vector2();
+        
 
         //Get player input
         if (Input.GetKey(KeyCode.A))
@@ -79,13 +165,6 @@ public class PlayerController : MonoBehaviour
             acceleration = 0;
         }
 
-        if (Input.GetKey(KeyCode.W))
-        {
-            playerInput = Vector2.up;
-            //Debug.Log("jumped!");
-
-        }
-
         //set coyote timer to full if player is still grounded
         if (IsGrounded() == true)
         {
@@ -106,6 +185,14 @@ public class PlayerController : MonoBehaviour
     {
         currentVelocity = playerRigidbody.velocity;
 
+        //player jump
+        if (playerInput == Vector2.up && (IsGrounded() == true || coyoteTimer >= 0))
+        {
+            currentVelocity.y += (initialJumpVelocity);
+
+            coyoteTimer = -1;
+        }
+
         if (playerInput == Vector2.left) //player move
         {
             currentVelocity.x = acceleration * -1 * Time.deltaTime;
@@ -119,15 +206,6 @@ public class PlayerController : MonoBehaviour
             currentVelocity.x = 0;
         }
 
-        //player jump
-        if (playerInput == Vector2.up && (IsGrounded() == true || coyoteTimer >= 0)) 
-        {
-            currentVelocity.y += (initialJumpVelocity);
-
-            coyoteTimer = -1;
-        }
-
-        
         playerRigidbody.velocity = currentVelocity + gravity * Vector2.up *Time.deltaTime;
 
         if (playerRigidbody.velocity.y <= terminalSpeed)
@@ -162,6 +240,15 @@ public class PlayerController : MonoBehaviour
         }
     }
 
+    public bool IsDead()
+    {
+        return health <= 0;
+    }
+
+    public void OnDeathAnimationComplete()
+    {
+        gameObject.SetActive(false);
+    }
     public FacingDirection GetFacingDirection()
     {
         if (Input.GetKey(KeyCode.A))
@@ -183,4 +270,5 @@ public class PlayerController : MonoBehaviour
             return FacingDirection.right;
         }
     }
+
 }
