@@ -10,7 +10,7 @@ public class PlayerController : MonoBehaviour
 
     public Rigidbody2D playerRigidbody;
     public float acceleration;
-    public float maxSpeed = 200f;
+    public float maxSpeed = 10f;
     public float accelSpeed = 10f;
 
     //jump values
@@ -33,6 +33,11 @@ public class PlayerController : MonoBehaviour
     public int health = 10;
 
     Vector2 playerInput = new Vector2();
+
+    //MOVEMENT BOOLS
+    public bool jumped = false;
+    public bool movedLeft = false;
+    public bool movedRight = false;
 
     public enum FacingDirection
     {
@@ -61,10 +66,9 @@ public class PlayerController : MonoBehaviour
     {
         previousCharacterState = currentCharacterState;
 
-        if (Input.GetKeyDown(KeyCode.W))
+        if (Input.GetKeyDown(KeyCode.W) && IsGrounded() == true)
         {
-            playerInput = Vector2.up;
-            //Debug.Log("jumped!");
+            jumped = true;
         }
 
         switch (currentCharacterState)
@@ -125,7 +129,6 @@ public class PlayerController : MonoBehaviour
             currentCharacterState = CharacterState.die;
         }
 
-        
 
     }
     // Update is called once per frame
@@ -139,7 +142,8 @@ public class PlayerController : MonoBehaviour
         //Get player input
         if (Input.GetKey(KeyCode.A))
         {
-            playerInput = Vector2.left;
+            movedLeft = true;
+            movedRight = false;
 
             acceleration += accelSpeed;
 
@@ -150,7 +154,8 @@ public class PlayerController : MonoBehaviour
         }
         else if (Input.GetKey(KeyCode.D))
         {
-            playerInput = Vector2.right;
+            movedRight = true;
+            movedLeft = false;
 
             acceleration += accelSpeed;
 
@@ -163,6 +168,8 @@ public class PlayerController : MonoBehaviour
         {
             //Return acceleration to zero when nothing is pressed
             acceleration = 0;
+            movedRight = false;
+            movedLeft = false;
         }
 
         //set coyote timer to full if player is still grounded
@@ -186,20 +193,22 @@ public class PlayerController : MonoBehaviour
         currentVelocity = playerRigidbody.velocity;
 
         //player jump
-        if (playerInput == Vector2.up && (IsGrounded() == true || coyoteTimer >= 0))
+        if (jumped && (IsGrounded() == true || coyoteTimer >= 0))
         {
             currentVelocity.y += (initialJumpVelocity);
 
             coyoteTimer = -1;
+
+            jumped = false;
         }
 
-        if (playerInput == Vector2.left) //player move
+        if (movedLeft) //player move
         {
-            currentVelocity.x = acceleration * -1 * Time.deltaTime;
+            currentVelocity.x += acceleration * -1 * Time.deltaTime;
         }
-        else if (playerInput == Vector2.right)
+        else if (movedRight)
         {
-            currentVelocity.x = acceleration * 1 * Time.deltaTime;
+            currentVelocity.x += acceleration * 1 * Time.deltaTime;
         }
         else
         {

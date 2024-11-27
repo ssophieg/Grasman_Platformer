@@ -1695,8 +1695,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   playerRigidbody: {fileID: 1433354318}
   acceleration: 0
-  maxSpeed: 200
-  accelSpeed: 10
+  maxSpeed: 5
+  accelSpeed: 1
   apexHeight: 4
   apexTime: 1
   currentVelocity: {x: 0, y: 0}
@@ -1704,6 +1704,12 @@ MonoBehaviour:
   gravity: 0
   terminalSpeed: -6
   coyoteTimer: 5
+  health: 10
+  jumped: 0
+  movedLeft: 0
+  movedRight: 0
+  currentCharacterState: 0
+  previousCharacterState: 0
 --- !u!4 &1433354315
 Transform:
   m_ObjectHideFlags: 0
