@@ -4,9 +4,13 @@ using Unity.Burst.CompilerServices;
 using UnityEditor.Search;
 using UnityEngine;
 using UnityEngine.Rendering;
+using UnityEngine.UI;
 
 public class PlayerController : MonoBehaviour
 {
+    //collectables UI
+    public Text collectablesFound;
+    public float coins;
 
     public Rigidbody2D playerRigidbody;
     public float acceleration;
@@ -27,7 +31,7 @@ public class PlayerController : MonoBehaviour
 
     //coyote time timer
 
-    public float coyoteTimer = 5;
+    public float coyoteTimer = 1;
 
     //Week 12
     public int health = 10;
@@ -66,7 +70,7 @@ public class PlayerController : MonoBehaviour
     {
         previousCharacterState = currentCharacterState;
 
-        if (Input.GetKeyDown(KeyCode.W) && IsGrounded() == true)
+        if (Input.GetKeyDown(KeyCode.W) && coyoteTimer >= 0)
         {
             jumped = true;
         }
@@ -185,7 +189,7 @@ public class PlayerController : MonoBehaviour
         currentVelocity = playerRigidbody.velocity;
 
         //player jump
-        if (jumped && (IsGrounded() == true || coyoteTimer >= 0))
+        if (jumped && coyoteTimer >= 0)
         {
             currentVelocity.y += (initialJumpVelocity);
 
@@ -279,6 +283,15 @@ public class PlayerController : MonoBehaviour
         else
         {
             return FacingDirection.right;
+        }
+    }
+
+    private void OnTriggerEnter2D(Collider2D collision)
+    {
+        if (collision.tag == "Coin")
+        {
+            coins += 1;
+            collectablesFound.text = "" + (coins);
         }
     }
 
