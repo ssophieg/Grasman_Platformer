@@ -68,6 +68,9 @@ public class PlayerController : MonoBehaviour
 
     private void Update()
     {
+
+        Debug.Log(AgainstWall());
+
         previousCharacterState = currentCharacterState;
 
         if (Input.GetKeyDown(KeyCode.W) && coyoteTimer >= 0)
@@ -220,7 +223,16 @@ public class PlayerController : MonoBehaviour
             currentVelocity.x = -maxSpeed;
         }
 
-        playerRigidbody.velocity = currentVelocity + gravity * Vector2.up *Time.deltaTime;
+        //apply gravity
+        if (AgainstWall() == false)
+        {
+            playerRigidbody.velocity = currentVelocity + gravity * Vector2.up * Time.deltaTime;
+        }
+        else
+        {
+            playerRigidbody.velocity = currentVelocity;
+            coyoteTimer = 1;
+        }
 
         if (playerRigidbody.velocity.y <= terminalSpeed)
         {
@@ -230,6 +242,17 @@ public class PlayerController : MonoBehaviour
 
     }
 
+    public bool AgainstWall()
+    {
+        if (Physics2D.Raycast(playerRigidbody.position, Vector2.left, 0.65f) || (Physics2D.Raycast(playerRigidbody.position, Vector2.right, 0.65f)))
+        {
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+    }
     public bool IsWalking()
     {
         if (Input.GetKey(KeyCode.A) || Input.GetKey(KeyCode.D))
