@@ -10,8 +10,8 @@ public class PlayerController : MonoBehaviour
 
     public Rigidbody2D playerRigidbody;
     public float acceleration;
-    public float maxSpeed = 10f;
-    public float accelSpeed = 10f;
+    public float maxSpeed = 7f;
+    public float accelSpeed = 1f;
 
     //jump values
     public float apexHeight = 4;
@@ -147,10 +147,6 @@ public class PlayerController : MonoBehaviour
 
             acceleration += accelSpeed;
 
-            if (acceleration >= maxSpeed)
-            {
-                acceleration = maxSpeed;
-            }
         }
         else if (Input.GetKey(KeyCode.D))
         {
@@ -159,10 +155,6 @@ public class PlayerController : MonoBehaviour
 
             acceleration += accelSpeed;
 
-            if (acceleration >= maxSpeed)
-            {
-                acceleration = maxSpeed;
-            }
         }
         else
         {
@@ -215,6 +207,15 @@ public class PlayerController : MonoBehaviour
             currentVelocity.x = 0;
         }
 
+        if(currentVelocity.x >= maxSpeed)
+        {
+            currentVelocity.x = maxSpeed;
+        }
+        else if(currentVelocity.x <= -maxSpeed)
+        {
+            currentVelocity.x = -maxSpeed;
+        }
+
         playerRigidbody.velocity = currentVelocity + gravity * Vector2.up *Time.deltaTime;
 
         if (playerRigidbody.velocity.y <= terminalSpeed)
@@ -222,6 +223,7 @@ public class PlayerController : MonoBehaviour
             playerRigidbody.velocity = new Vector2(currentVelocity.x + gravity * Time.deltaTime, terminalSpeed);
         } 
         //Debug.Log(playerRigidbody.velocity.y);
+
     }
 
     public bool IsWalking()
