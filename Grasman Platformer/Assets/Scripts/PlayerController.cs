@@ -43,6 +43,17 @@ public class PlayerController : MonoBehaviour
     public bool movedLeft = false;
     public bool movedRight = false;
 
+    //DASH BOOLS
+    public bool dashLeft = false;
+    public bool dashRight = false;
+
+    //dash timer
+    public float dashTime = 5;
+    public float maxDashTime = 5;
+    public float dashSpeed = 600;
+
+    public float previousAcceleration;
+
     public enum FacingDirection
     {
         left, right
@@ -71,11 +82,70 @@ public class PlayerController : MonoBehaviour
 
         previousCharacterState = currentCharacterState;
 
-        if (Input.GetKeyDown(KeyCode.W) && coyoteTimer >= 0)
+        //dash input
+        if(Input.GetKeyDown(KeyCode.Q) && Input.GetKey(KeyCode.A) && dashTime == maxDashTime) 
+        {
+            dashLeft = true;
+            previousAcceleration = acceleration;
+        }
+
+        if (Input.GetKeyDown(KeyCode.Q) && Input.GetKey(KeyCode.D) && dashTime == maxDashTime)
+        {
+            dashRight = true;
+            previousAcceleration = acceleration;
+        }
+
+        //dash timer reset
+
+        if (dashLeft == false && dashRight == false)
+        {
+            dashTime = maxDashTime;
+        }
+        else if (dashLeft == true || dashRight == true)
+        {
+            dashTime -= 0.1f;
+        }
+
+        //stop dash when timer ends
+        if (dashTime <= 0)
+        {
+            dashLeft = false;
+            dashRight = false;
+            acceleration = previousAcceleration;
+        }
+
+        //Get player jump input
+        if (Input.GetKeyDown(KeyCode.W) && coyoteTimer >= 0 && dashTime == maxDashTime)
         {
             jumped = true;
         }
 
+        //Get player horizontal input
+        if (Input.GetKey(KeyCode.A) && dashTime == maxDashTime)
+        {
+            movedLeft = true;
+            movedRight = false;
+
+            acceleration += accelSpeed;
+
+        }
+        else if (Input.GetKey(KeyCode.D) && dashTime == maxDashTime)
+        {
+            movedRight = true;
+            movedLeft = false;
+
+            acceleration += accelSpeed;
+
+        }
+        else
+        {
+            //Return acceleration to zero when nothing is pressed
+            acceleration = 0;
+            movedRight = false;
+            movedLeft = false;
+        }
+
+        //animation character state
         switch (currentCharacterState)
         {
             case CharacterState.die:
@@ -138,36 +208,7 @@ public class PlayerController : MonoBehaviour
     }
     // Update is called once per frame
     void FixedUpdate()
-    {
-
-        //The input from the player needs to be determined and then passed in the to the MovementUpdate which should
-        //manage the actual movement of the character.
-        
-
-        //Get player input
-        if (Input.GetKey(KeyCode.A))
-        {
-            movedLeft = true;
-            movedRight = false;
-
-            acceleration += accelSpeed;
-
-        }
-        else if (Input.GetKey(KeyCode.D))
-        {
-            movedRight = true;
-            movedLeft = false;
-
-            acceleration += accelSpeed;
-
-        }
-        else
-        {
-            //Return acceleration to zero when nothing is pressed
-            acceleration = 0;
-            movedRight = false;
-            movedLeft = false;
-        }
+    {        
 
         //set coyote timer to full if player is still grounded
         if (IsGrounded() == true)
@@ -219,6 +260,19 @@ public class PlayerController : MonoBehaviour
         else if(currentVelocity.x <= -maxSpeed)
         {
             currentVelocity.x = -maxSpeed;
+        }
+        //dash
+        if (dashLeft == true && dashTime > 0)
+        {
+            playerRigidbody.velocity = currentVelocity;
+            currentVelocity.x += dashSpeed * -1 * Time.deltaTime;
+        }
+
+        //dash
+        if (dashRight == true && dashTime > 0)
+        {
+            playerRigidbody.velocity = currentVelocity;
+            currentVelocity.x += dashSpeed * 1 * Time.deltaTime;
         }
 
         //apply gravity
