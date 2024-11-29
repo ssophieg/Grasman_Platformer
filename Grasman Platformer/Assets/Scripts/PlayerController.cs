@@ -264,6 +264,7 @@ public class PlayerController : MonoBehaviour
         //dash
         if (dashLeft == true && dashTime > 0)
         {
+            currentVelocity.y = 0;
             playerRigidbody.velocity = currentVelocity;
             currentVelocity.x += dashSpeed * -1 * Time.deltaTime;
         }
@@ -271,6 +272,7 @@ public class PlayerController : MonoBehaviour
         //dash
         if (dashRight == true && dashTime > 0)
         {
+            currentVelocity.y = 0;
             playerRigidbody.velocity = currentVelocity;
             currentVelocity.x += dashSpeed * 1 * Time.deltaTime;
         }
