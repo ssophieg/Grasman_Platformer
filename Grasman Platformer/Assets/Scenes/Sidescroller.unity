@@ -2095,6 +2095,14 @@ MonoBehaviour:
   jumped: 0
   movedLeft: 0
   movedRight: 0
+  dashLeft: 0
+  dashRight: 0
+  dashTime: 5
+  maxDashTime: 5
+  dashSpeed: 600
+  previousAcceleration: 0
+  doubleJump: 1
+  doubleJumpAvailable: 1
   currentCharacterState: 0
   previousCharacterState: 0
 --- !u!4 &1433354315

@@ -1,3 +1,4 @@
+using JetBrains.Annotations;
 using System.Collections;
 using System.Collections.Generic;
 using Unity.Burst.CompilerServices;
@@ -54,6 +55,10 @@ public class PlayerController : MonoBehaviour
 
     public float previousAcceleration;
 
+    //double jump availability
+    public bool doubleJump = false;
+    public bool doubleJumpAvailable = false;
+
     public enum FacingDirection
     {
         left, right
@@ -73,7 +78,9 @@ public class PlayerController : MonoBehaviour
 
         //jump position formula values calculations
         initialJumpVelocity = 2 * apexHeight / apexTime;
-        gravity = -2 * apexHeight / (apexTime * apexTime); 
+        gravity = -2 * apexHeight / (apexTime * apexTime);
+
+        doubleJump = false;
    
     }
 
@@ -81,6 +88,12 @@ public class PlayerController : MonoBehaviour
     {
 
         previousCharacterState = currentCharacterState;
+
+        //set double jump to available if grounded or attatched to any walls
+        if (IsGrounded() == true || AgainstWall() == true)
+        {
+            doubleJumpAvailable = true;
+        }
 
         //dash input
         if(Input.GetKeyDown(KeyCode.Q) && Input.GetKey(KeyCode.A) && dashTime == maxDashTime) 
@@ -118,6 +131,12 @@ public class PlayerController : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.W) && coyoteTimer >= 0 && dashTime == maxDashTime)
         {
             jumped = true;
+        }
+
+        //Get player double jump input
+        if (Input.GetKeyDown(KeyCode.W) && dashTime == maxDashTime && IsGrounded() == false && AgainstWall() == false)
+        {
+            doubleJump = true;
         }
 
         //Get player horizontal input
@@ -261,7 +280,7 @@ public class PlayerController : MonoBehaviour
         {
             currentVelocity.x = -maxSpeed;
         }
-        //dash
+        // left dash
         if (dashLeft == true && dashTime > 0)
         {
             currentVelocity.y = 0;
@@ -269,13 +288,24 @@ public class PlayerController : MonoBehaviour
             currentVelocity.x += dashSpeed * -1 * Time.deltaTime;
         }
 
-        //dash
+        //right dash
         if (dashRight == true && dashTime > 0)
         {
             currentVelocity.y = 0;
             playerRigidbody.velocity = currentVelocity;
             currentVelocity.x += dashSpeed * 1 * Time.deltaTime;
         }
+
+        //double jump
+        if (doubleJump == true && doubleJumpAvailable == true)
+        {
+            doubleJumpAvailable = false;
+            doubleJump = false;
+            currentVelocity.y = 0;
+            currentVelocity.y += (initialJumpVelocity);
+
+            coyoteTimer = -1;
+        } 
 
         //apply gravity
         if (AgainstWall() == false)
