@@ -69,8 +69,6 @@ public class PlayerController : MonoBehaviour
     private void Update()
     {
 
-        Debug.Log(AgainstWall());
-
         previousCharacterState = currentCharacterState;
 
         if (Input.GetKeyDown(KeyCode.W) && coyoteTimer >= 0)
@@ -192,7 +190,7 @@ public class PlayerController : MonoBehaviour
         currentVelocity = playerRigidbody.velocity;
 
         //player jump
-        if (jumped && coyoteTimer >= 0)
+        if (jumped && coyoteTimer >= 0 && AgainstWall() == false)
         {
             currentVelocity.y += (initialJumpVelocity);
 
