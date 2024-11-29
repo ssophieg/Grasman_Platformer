@@ -284,6 +284,7 @@ public class PlayerController : MonoBehaviour
         }
         else
         {
+            currentVelocity.y -= 0.01f;
             playerRigidbody.velocity = currentVelocity;
             coyoteTimer = 1;
         }
