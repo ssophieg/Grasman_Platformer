@@ -59,6 +59,9 @@ public class PlayerController : MonoBehaviour
     public bool doubleJump = false;
     public bool doubleJumpAvailable = false;
 
+    //wall jump availability
+    public float wallJumpAvailable = 0.5f;
+
     public enum FacingDirection
     {
         left, right
@@ -86,6 +89,8 @@ public class PlayerController : MonoBehaviour
 
     private void Update()
     {
+
+        Debug.Log(jumped);
 
         previousCharacterState = currentCharacterState;
 
@@ -131,6 +136,20 @@ public class PlayerController : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.W) && coyoteTimer >= 0 && dashTime == maxDashTime)
         {
             jumped = true;
+            wallJumpAvailable = 0.5f;
+        }
+
+        //set wall jump to available if attached to wall
+        if (AgainstWall() == true && jumped)
+        {
+
+            wallJumpAvailable -= 0.01f;
+
+            if (wallJumpAvailable <= 0)
+            {
+                jumped = false;
+            }
+            
         }
 
         //Get player double jump input
@@ -240,7 +259,7 @@ public class PlayerController : MonoBehaviour
             coyoteTimer -= 0.1f;
         }
 
-        Debug.Log(coyoteTimer);
+        //Debug.Log(coyoteTimer);
         MovementUpdate(playerInput);
 
     }
