@@ -90,7 +90,7 @@ public class PlayerController : MonoBehaviour
     private void Update()
     {
 
-        Debug.Log(jumped);
+        Debug.Log(IsGrounded());
 
         previousCharacterState = currentCharacterState;
 
@@ -370,7 +370,8 @@ public class PlayerController : MonoBehaviour
     }
     public bool IsGrounded()
     {
-        if (Physics2D.Raycast(playerRigidbody.position, Vector2.down, 0.7f))
+        if (Physics2D.Raycast(playerRigidbody.position - new Vector2 (-0.3f, 0), Vector2.down, 0.7f) ||
+            Physics2D.Raycast(playerRigidbody.position - new Vector2(0.3f, 0), Vector2.down, 0.7f))
         {
             //Debug.Log("Grounded");
             return true;
