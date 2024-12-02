@@ -13,7 +13,10 @@ public class PlayerController : MonoBehaviour
     public Text collectablesFound;
     public float coins;
 
+    //player's rigidbody
     public Rigidbody2D playerRigidbody;
+
+    //speed values
     public float acceleration;
     public float maxSpeed = 7f;
     public float accelSpeed = 1f;
@@ -28,13 +31,14 @@ public class PlayerController : MonoBehaviour
 
     public float terminalSpeed = -6;
 
+    //last horizontal key pressed (to determine player direction)
     float lastKey = 1;
 
     //coyote time timer
 
     public float coyoteTimer = 1;
 
-    //Week 12
+    //player health
     public int health = 10;
 
     Vector2 playerInput = new Vector2();
@@ -53,6 +57,7 @@ public class PlayerController : MonoBehaviour
     public float maxDashTime = 5;
     public float dashSpeed = 600;
 
+    //acceleration before the dash
     public float previousAcceleration;
 
     //double jump availability
@@ -83,14 +88,13 @@ public class PlayerController : MonoBehaviour
         initialJumpVelocity = 2 * apexHeight / apexTime;
         gravity = -2 * apexHeight / (apexTime * apexTime);
 
+        //set double jump to false in order to prevent jumping upon startup
         doubleJump = false;
    
     }
 
     private void Update()
     {
-
-        Debug.Log(IsGrounded());
 
         previousCharacterState = currentCharacterState;
 
@@ -100,13 +104,16 @@ public class PlayerController : MonoBehaviour
             doubleJumpAvailable = true;
         }
 
-        //dash input
+        //Get player dash input
+
+        //Left dash
         if(Input.GetKeyDown(KeyCode.Q) && Input.GetKey(KeyCode.A) && dashTime == maxDashTime) 
         {
             dashLeft = true;
             previousAcceleration = acceleration;
         }
 
+        //Right dash
         if (Input.GetKeyDown(KeyCode.Q) && Input.GetKey(KeyCode.D) && dashTime == maxDashTime)
         {
             dashRight = true;
@@ -183,7 +190,8 @@ public class PlayerController : MonoBehaviour
             movedLeft = false;
         }
 
-        //animation character state
+        //animation character states - set states depending on current state and whether or not the player
+        //is jumping, idle, walking, or on the gorund
         switch (currentCharacterState)
         {
             case CharacterState.die:
@@ -237,6 +245,7 @@ public class PlayerController : MonoBehaviour
 
         }
 
+        //if player health is zero or less
         if (IsDead()) 
         {
             currentCharacterState = CharacterState.die;
@@ -264,33 +273,42 @@ public class PlayerController : MonoBehaviour
 
     }
 
+    //ALL MOVEMENT IS SET HERE BASED ON BOOLEANS THAT ARE TURNED TO TRUE BASED ON PLAYER'S INPUT
+
+    //PLAYER'S INPUT AND BOOL CHANGES ARE DONE IN UPDATES
     private void MovementUpdate(Vector2 playerInput)
     {
         currentVelocity = playerRigidbody.velocity;
 
-        //player jump
+        //player jump 
         if (jumped && coyoteTimer >= 0 && AgainstWall() == false)
         {
             currentVelocity.y += (initialJumpVelocity);
 
+            //coyote timer no longer allowed
             coyoteTimer = -1;
 
+            //jumped bool set to false
             jumped = false;
         }
 
         if (movedLeft) //player move
         {
+            //left movement
             currentVelocity.x += acceleration * -1 * Time.deltaTime;
         }
         else if (movedRight)
         {
+            //right movement
             currentVelocity.x += acceleration * 1 * Time.deltaTime;
         }
         else
         {
+            //idle
             currentVelocity.x = 0;
         }
 
+        //set max speed - player velocity cannot go over this value
         if(currentVelocity.x >= maxSpeed)
         {
             currentVelocity.x = maxSpeed;
@@ -299,9 +317,11 @@ public class PlayerController : MonoBehaviour
         {
             currentVelocity.x = -maxSpeed;
         }
-        // left dash
+
+        //left dash 
         if (dashLeft == true && dashTime > 0)
         {
+            //set y axis velocity to zero for duration of dash
             currentVelocity.y = 0;
             playerRigidbody.velocity = currentVelocity;
             currentVelocity.x += dashSpeed * -1 * Time.deltaTime;
@@ -320,6 +340,8 @@ public class PlayerController : MonoBehaviour
         {
             doubleJumpAvailable = false;
             doubleJump = false;
+
+            //set y axis velocity to zero to prevent negative velocity carrying over to double jump
             currentVelocity.y = 0;
             currentVelocity.y += (initialJumpVelocity);
 
@@ -329,15 +351,20 @@ public class PlayerController : MonoBehaviour
         //apply gravity
         if (AgainstWall() == false)
         {
+            //apply gravity as normal when not against wall
             playerRigidbody.velocity = currentVelocity + gravity * Vector2.up * Time.deltaTime;
         }
         else
         {
+            //slowly increment player velocity downwards when attached to wall to make them slide down
             currentVelocity.y -= 0.01f;
             playerRigidbody.velocity = currentVelocity;
+
+            //set coyote timer above zero so player may jump
             coyoteTimer = 1;
         }
 
+        //set terminal falling speed - player cannot fall faster than terminalSpeed
         if (playerRigidbody.velocity.y <= terminalSpeed)
         {
             playerRigidbody.velocity = new Vector2(currentVelocity.x + gravity * Time.deltaTime, terminalSpeed);
@@ -346,6 +373,7 @@ public class PlayerController : MonoBehaviour
 
     }
 
+    //test if the player is attached to a wall on either side
     public bool AgainstWall()
     {
         if (Physics2D.Raycast(playerRigidbody.position, Vector2.left, 0.65f) || (Physics2D.Raycast(playerRigidbody.position, Vector2.right, 0.65f)))
@@ -357,6 +385,8 @@ public class PlayerController : MonoBehaviour
             return false;
         }
     }
+
+    //test if the player is currently walking
     public bool IsWalking()
     {
         if (Input.GetKey(KeyCode.A) || Input.GetKey(KeyCode.D))
@@ -368,6 +398,8 @@ public class PlayerController : MonoBehaviour
             return false;
         }
     }
+
+    //test if the player is on the ground
     public bool IsGrounded()
     {
         if (Physics2D.Raycast(playerRigidbody.position - new Vector2 (-0.3f, 0), Vector2.down, 0.7f) ||
@@ -383,17 +415,22 @@ public class PlayerController : MonoBehaviour
         }
     }
 
+    //test if the player is dead
     public bool IsDead()
     {
         return health <= 0;
     }
 
+    //set player object inactive once player death animation is complete
     public void OnDeathAnimationComplete()
     {
         gameObject.SetActive(false);
     }
+
+    //test which direction the player is facing
     public FacingDirection GetFacingDirection()
     {
+        //direction is returned depending on the last horizontal key pressed by the player
         if (Input.GetKey(KeyCode.A))
         {
             lastKey = 1;
@@ -414,10 +451,12 @@ public class PlayerController : MonoBehaviour
         }
     }
 
+    //detect if a coin is picked up
     private void OnTriggerEnter2D(Collider2D collision)
     {
         if (collision.tag == "Coin")
         {
+            //add one to the total amount of coins found and set the text UI counter to this value
             coins += 1;
             collectablesFound.text = "" + (coins);
         }
