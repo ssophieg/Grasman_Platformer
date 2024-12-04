@@ -12,6 +12,8 @@ public class PlayerVisuals : MonoBehaviour
     public SpriteRenderer bodyRenderer;
     public PlayerController playerController;
 
+    public CameraController cameraController;
+
     private int idleHash, walkingHash, jumpingHash, deathHash;
 
     // Start is called before the first frame update
@@ -37,6 +39,10 @@ public class PlayerVisuals : MonoBehaviour
             switch (playerController.currentCharacterState)
             {
                 case PlayerController.CharacterState.idle:
+                    if(playerController.previousCharacterState == PlayerController.CharacterState.jump)
+                    {
+                        cameraController.Shake(5f, 0.35f);
+                    }
                     animator.CrossFade("Idle", 0f);
                     break;
                 case PlayerController.CharacterState.walk:
